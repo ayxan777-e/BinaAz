@@ -1,7 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using Persistence.Context;
 using Application.Abstracts.Repositories;
+using Application.Abstracts.Services;
+using Application.Mapping;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Persistence.Context;
 using Persistence.Repositories;
+using Persistence.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,12 +16,18 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped(typeof(IRepository<,>),
-                           typeof(GenericRepository<,>));
 
 builder.Services.AddDbContext<BinaLiteDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddAutoMapper(cfg => { }, typeof(PropertyAdProfile).Assembly);
+builder.Services.AddScoped(typeof(IRepository<,>),
+                           typeof(GenericRepository<,>));
+
+builder.Services.AddScoped<IPropertyAdService, PropertyAdServices>();
+
 var app = builder.Build();
+
 
 
 

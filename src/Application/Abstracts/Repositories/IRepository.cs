@@ -4,10 +4,10 @@ namespace Application.Abstracts.Repositories;
 
 public interface IRepository<Tentity,Tkey> where Tentity : BaseEntity<Tkey>
 {
-    List<Tentity> GetAll();
-    void Add(Tentity entity);
-    void Update(Tentity entity);
-    void Delete(Tentity entity);
-    Tentity GetById(Tkey id);
-    void SaveChanges();
+    Task<List<Tentity>> GetAllAsync();
+    Task AddAsync(Tentity entity);
+    Task UpdateAsync(Tentity entity);
+    Task DeleteAsync(Tentity entity);
+    Task<Tentity> GetByIdAsync(Tkey id);
+    Task SaveChanges();
 }

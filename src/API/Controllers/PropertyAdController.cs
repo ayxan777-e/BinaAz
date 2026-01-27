@@ -1,4 +1,6 @@
 ﻿using Application.Abstracts.Repositories;
+using Application.Abstracts.Services;
+using Application.DTOs.PropertyAd;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,55 +13,34 @@ namespace API.Controllers;
 [ApiController]
 public class PropertyAdController : ControllerBase
 {
-
-    private readonly IRepository<PropertyAd, int> _repository;
-    public PropertyAdController(IRepository<PropertyAd,int> repository)
+    private readonly IPropertyAdService _propertyAdService;
+    public PropertyAdController(IPropertyAdService propertyAdService)
     {
-        _repository = repository;
+        _propertyAdService = propertyAdService;
     }
     [HttpGet]
-    public IActionResult GetAll()
+    public async  Task<IActionResult> GetAllAsync()
     {
-        var propertyAds = _repository.GetAll();
+        var propertyAds = await _propertyAdService.GetAllAsync();
         return Ok(propertyAds);
     }
-    [HttpGet("{id}")]
-    public IActionResult GetById(int id) {
-        var propertyAd = _repository.GetById(id);
+    [HttpPost]
+    public async Task<IActionResult> CreateAsync([FromBody] CreatePropertyAdRequest request)
+    {
+        await _propertyAdService.CreateAsync(request);
+        return Ok();
+    }
+    [HttpGet]
+    [Route("{id}")]
+    public async  Task<IActionResult> GetByIdAsync(int id)
+    {
+        var propertyAd = await _propertyAdService.GetByIdAsync(id);
         if (propertyAd == null)
-        {
             return NotFound();
-        }
         return Ok(propertyAd);
     }
-    [HttpPost]
-    public IActionResult Create(PropertyAd propertyAd)
-    {
-        _repository.Add(propertyAd);
-        return CreatedAtAction(nameof(GetById), new { id = propertyAd.Id }, propertyAd);
-    }
-    [HttpPut("{id}")]
-    public IActionResult Update(int id, PropertyAd propertyAd)
-    {
-        if (id != propertyAd.Id)
-        {
-            return BadRequest();
-        }
-        _repository.Update(propertyAd);
-        return NoContent();
-    }
-    [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
-        {
-        var propertyAd = _repository.GetById(id);
-        if (propertyAd == null)
-        {
-            return NotFound();
-        }
-        _repository.Delete(propertyAd);
-        return NoContent();
-    }
-    
+
+
 
 
 }

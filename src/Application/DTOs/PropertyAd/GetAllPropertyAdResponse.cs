@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Application.DTOs.PropertyAd;
 
-namespace Application.DTOs.PropertyAd
+public class GetAllPropertyAdResponse
 {
-    internal class GetAllPropertyAdResponse
-    {
-    }
+    public int Id { get; set; }
+    public string Title { get; set; }=null!;
+    public string? Description { get; set; }
+   
 }

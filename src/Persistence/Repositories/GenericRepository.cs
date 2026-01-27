@@ -14,33 +14,40 @@ public class GenericRepository<Tentity, Tkey> : IRepository<Tentity, Tkey> where
         _context = context;
         _table = _context.Set<Tentity>();
     }
-    public void Add(Tentity entity)
-    {  
-        _table.Add(entity);
-    }
-
-    public void Delete(Tentity entity)
+    public async Task AddAsync(Tentity entity)
     {
-        _table.Remove(entity);
+        await _table.AddAsync(entity);
+        await _context.SaveChangesAsync();
     }
 
-    public List<Tentity> GetAll()
+    public async Task DeleteAsync(Tentity entity)
     {
-        return _table.ToList();
+       _table.Remove(entity);
+         await _context.SaveChangesAsync();
     }
 
-    public Tentity GetById(Tkey id)
+    public async Task<List<Tentity>> GetAllAsync()
     {
-        return _table.Find(id);
+      return await _table.ToListAsync();
     }
 
-    public void SaveChanges()
+    public async Task<Tentity> GetByIdAsync(Tkey id)
     {
-        _context.SaveChanges();
+       
+       var entity = await _table.FindAsync(id);
+       if (entity == null)
+           throw new InvalidOperationException($"Entity of type {typeof(Tentity).Name} with id '{id}' was not found.");
+       return entity;
     }
 
-    public void Update(Tentity entity)
+    public async Task SaveChanges()
+    {
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(Tentity entity)
     {
         _table.Update(entity);
+        await _context.SaveChangesAsync();
     }
 }
