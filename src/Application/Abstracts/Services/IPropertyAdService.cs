@@ -6,6 +6,6 @@ public interface IPropertyAdService
 {
     Task<List<GetAllPropertyAdResponse>> GetAllAsync();
     Task<GetByIdPropertyAdResponse> GetByIdAsync(int id);
-    Task CreateAsync(CreatePropertyAdRequest request);
-
+    Task<bool> CreateAsync(CreatePropertyAdRequest request);
+    Task<bool> UpdateAsync(int id, UpdatePropertyAdRequest request);
 }

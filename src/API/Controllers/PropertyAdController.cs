@@ -1,6 +1,7 @@
 ﻿using Application.Abstracts.Repositories;
 using Application.Abstracts.Services;
 using Application.DTOs.PropertyAd;
+using Application.Shared.Helpers;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,10 +26,12 @@ public class PropertyAdController : ControllerBase
         return Ok(propertyAds);
     }
     [HttpPost]
-    public async Task<IActionResult> CreateAsync([FromBody] CreatePropertyAdRequest request)
+    public async Task<ActionResult<BaseResponse>> CreateAsync([FromBody] CreatePropertyAdRequest request)
     {
-        await _propertyAdService.CreateAsync(request);
-        return Ok();
+       var ok= await _propertyAdService.CreateAsync(request);
+        if(!ok) return BadRequest(BaseResponse.Fail("Could not create PropertyAd"));
+
+        return Ok(BaseResponse.Ok("Created."));
     }
     [HttpGet]
     [Route("{id}")]
@@ -39,7 +42,14 @@ public class PropertyAdController : ControllerBase
             return NotFound();
         return Ok(propertyAd);
     }
-
+    [HttpPut]
+    [Route("{id}")]
+    public async Task<ActionResult<BaseResponse>> UpdateAsync(int id, [FromBody] UpdatePropertyAdRequest request)
+    {
+        var ok = await _propertyAdService.UpdateAsync(id,request);
+        if (!ok) return BadRequest(BaseResponse.Fail("Could not update PropertyAd"));
+        return Ok(BaseResponse.Ok("Updated."));
+    }
 
 
 
