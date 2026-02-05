@@ -13,7 +13,7 @@ public class PropertyAdServices : IPropertyAdService
     private readonly IMapper _mapper;
     private readonly IValidator<CreatePropertyAdRequest> _createValidator;
 
-    public PropertyAdServices(IRepository<PropertyAd, int> repository,IMapper mapper,IValidator<CreatePropertyAdRequest> createValidator)
+    public PropertyAdServices(IRepository<PropertyAd, int> repository, IMapper mapper, IValidator<CreatePropertyAdRequest> createValidator)
     {
         _repository = repository;
         _mapper = mapper;
@@ -34,22 +34,27 @@ public class PropertyAdServices : IPropertyAdService
 
     public async Task<List<GetAllPropertyAdResponse>> GetAllAsync()
     {
-        var entities =  await _repository.GetAllAsync();
+        var entities = await _repository.GetAllAsync();
         return _mapper.Map<List<GetAllPropertyAdResponse>>(entities);
     }
 
     public async Task<GetByIdPropertyAdResponse> GetByIdAsync(int id)
     {
-        var entity = await  _repository.GetByIdAsync(id);
+        var entity = await _repository.GetByIdAsync(id);
+
+        if (entity == null)
+            throw new KeyNotFoundException("PropertyAd tapilmadi");
+
         return _mapper.Map<GetByIdPropertyAdResponse>(entity);
     }
+
 
     public async Task<bool> UpdateAsync(int id, UpdatePropertyAdRequest request)
     {
         var propertyAd = await _repository.GetByIdAsync(id);
 
         if (propertyAd == null)
-            throw new Exception("PropertyAd not found");
+            throw new KeyNotFoundException("PropertyAd tapilmadi");
 
         propertyAd.Title = request.Title;
         propertyAd.Description = request.Description;
@@ -60,4 +65,5 @@ public class PropertyAdServices : IPropertyAdService
 
         return true;
     }
+
 }

@@ -1,18 +1,16 @@
 ﻿using System.Net;
 using System.Text.Json;
+using FluentValidation;
 
 namespace API.Middlewares;
 
 public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
-    public ExceptionHandlingMiddleware(RequestDelegate next,
-        ILogger<ExceptionHandlingMiddleware> logger)
+    public ExceptionHandlingMiddleware(RequestDelegate next)
     {
         _next = next;
-        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -21,21 +19,36 @@ public class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
+        catch (ValidationException ex)
+        {
+            await WriteResponse(context, 400, "Validation error", ex.Errors.Select(e => e.ErrorMessage));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            await WriteResponse(context, 404, ex.Message);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            await WriteResponse(context, 401, "Unauthorized");
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unhandled exception occurred");
-
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            context.Response.ContentType = "application/json";
-
-            var response = new
-            {
-                StatusCode = context.Response.StatusCode,
-                Message = "Internal Server Error",
-                Detail = ex.Message
-            };
-
-            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+            await WriteResponse(context, 500, "Internal Server Error", ex.Message);
         }
+    }
+
+    private async Task WriteResponse(HttpContext context, int statusCode, string message, object? detail = null)
+    {
+        context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "application/json";
+
+        var response = new
+        {
+            statusCode,
+            message,
+            detail
+        };
+
+        await context.Response.WriteAsync(JsonSerializer.Serialize(response));
     }
 }

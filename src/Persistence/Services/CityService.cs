@@ -37,23 +37,30 @@ public class CityService : ICityServices
         return _mapper.Map<List<GetAllCityResponse>>(cities);
     }
 
-    public async Task<GetByIdCityResponse> GetByIdAsync(int id)
-    {
-        var city = await _repository.GetByIdAsync(id);
-        if (city == null)
-            throw new Exception("City not found");
+   public async Task<GetByIdCityResponse> GetByIdAsync(int id)
+{
+    var city = await _repository.GetByIdAsync(id);
 
-        return _mapper.Map<GetByIdCityResponse>(city);
-    }
+    if (city == null)
+        throw new KeyNotFoundException("City tapilmadi");
 
-    public async Task<bool> UpdateAsync(int id, UpdateCityRequest request)
-    {
-        var entity = _repository.GetByIdAsync(id).Result;
-        if (entity == null)
-            throw new Exception("City not found");
-        _mapper.Map(request, entity);
-        await _repository.UpdateAsync(entity);
-        await _repository.SaveChanges();
-        return true;
-    }
+    return _mapper.Map<GetByIdCityResponse>(city);
+}
+
+
+   public async Task<bool> UpdateAsync(int id, UpdateCityRequest request)
+{
+    var entity = await _repository.GetByIdAsync(id);
+
+    if (entity == null)
+        throw new KeyNotFoundException("City tapilmadi");
+
+    _mapper.Map(request, entity);
+
+    await _repository.UpdateAsync(entity);
+    await _repository.SaveChanges();
+
+    return true;
+}
+
 }

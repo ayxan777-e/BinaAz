@@ -57,7 +57,7 @@ public class StreetService : IStreetService
         var street = await _repository.GetByIdAsync(id);
 
         if (street == null)
-            throw new Exception("Street not found");
+            throw new KeyNotFoundException("Street tapilmadi");
 
         return new GetByIdStreetResponse
         {
@@ -69,15 +69,20 @@ public class StreetService : IStreetService
         };
     }
 
+
     public async Task<bool> UpdateAsync(int id, UpdateStreetRequest request)
     {
-        var street = _repository.GetByIdAsync(id).Result;
+        var street = await _repository.GetByIdAsync(id);
+
         if (street == null)
-            throw new Exception("Street not found");
+            throw new KeyNotFoundException("Street tapilmadi");
+
         street.Name = request.Name;
         street.Description = request.Description;
+
         await _repository.UpdateAsync(street);
         await _repository.SaveChanges();
+
         return true;
     }
 }

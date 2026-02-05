@@ -2,6 +2,7 @@
 using Application.Abstracts.Services.Simple;
 using Application.DTOs.Simple;
 using Domain.Entities.Simple;
+using System.ComponentModel.DataAnnotations;
 
 namespace Persistence.Services;
 
@@ -17,7 +18,8 @@ public class CarsImageService : ICarsImageService
     public async Task CreateAsync(CreateCarsImageRequest request)
     {
         if (request.File == null || request.File.Length == 0)
-            throw new Exception("File boşdur");
+            throw new ValidationException("File boş ola bilmez");
+
 
         var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads");
 
