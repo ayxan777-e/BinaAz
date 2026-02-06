@@ -2,14 +2,18 @@
 using Application.Abstracts.Repositories.SimpleRepo;
 using Application.Abstracts.Services;
 using Application.Abstracts.Services.Simple;
+using Application.Common;
 using Application.Mapping;
 using Application.Validations.City;
 using Application.Validations.PropertyAd;
 using Application.Validations.Street;
 using FluentValidation;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Minio;
 using Persistence.Context;
 using Persistence.Repositories;
 using Persistence.Repositories.Simple;
@@ -45,10 +49,30 @@ public static class ServiceRegistration
         services.AddScoped<IStreetService, StreetService>();
         services.AddScoped<ICarsImageRepo, CarsImageRepository>();
         services.AddScoped<ICarsImageService, CarsImageService>();
+        services.AddScoped<IPropertyMediaService, PropertyMediaService>();
+
 
         services.Configure<FormOptions>(options =>
         {
             options.MultipartBodyLengthLimit = 50 * 1024 * 1024;
         });
+
+        services.Configure<MinioOptions>(
+    configuration.GetSection("Minio"));
+
+        services.AddSingleton<IMinioClient>(sp =>
+        {
+            var options = sp.GetRequiredService<IOptions<MinioOptions>>().Value;
+
+            return new MinioClient()
+                .WithEndpoint(options.Endpoint)
+                .WithCredentials(options.AccessKey, options.SecretKey)
+                .WithSSL(options.UseSSL)
+                .Build();
+        });
+
+        services.AddScoped<IFileStorageService, MinioFileStorageService>();
+
+
     }
 }

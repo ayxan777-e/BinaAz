@@ -40,6 +40,12 @@ public class GenericRepository<Tentity, Tkey> : IRepository<Tentity, Tkey> where
        return entity;
     }
 
+    public IQueryable<Tentity> Query()
+    {
+        return _table.AsQueryable();
+
+    }
+
     public async Task SaveChanges()
     {
         await _context.SaveChangesAsync();

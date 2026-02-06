@@ -9,5 +9,7 @@ public interface IRepository<Tentity,Tkey> where Tentity : BaseEntity<Tkey>
     Task UpdateAsync(Tentity entity);
     Task DeleteAsync(Tentity entity);
     Task<Tentity> GetByIdAsync(Tkey id);
+    IQueryable<Tentity> Query();
+
     Task SaveChanges();
 }
