@@ -2,18 +2,16 @@
 using Application.Abstracts.Repositories.SimpleRepo;
 using Application.Abstracts.Services;
 using Application.Abstracts.Services.Simple;
-using Application.Common;
 using Application.Mapping;
 using Application.Validations.City;
 using Application.Validations.PropertyAd;
 using Application.Validations.Street;
+using Domain.Entities;
 using FluentValidation;
-using Infrastructure.Services;
+using Infrastructure.Extension;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Minio;
 using Persistence.Context;
 using Persistence.Repositories;
 using Persistence.Repositories.Simple;
@@ -56,23 +54,13 @@ public static class ServiceRegistration
         {
             options.MultipartBodyLengthLimit = 50 * 1024 * 1024;
         });
+        services.AddMinioInfrastructure(configuration);
 
-        services.Configure<MinioOptions>(
-    configuration.GetSection("Minio"));
-
-        services.AddSingleton<IMinioClient>(sp =>
+        services.AddIdentity<User, IdentityRole>(options =>
         {
-            var options = sp.GetRequiredService<IOptions<MinioOptions>>().Value;
-
-            return new MinioClient()
-                .WithEndpoint(options.Endpoint)
-                .WithCredentials(options.AccessKey, options.SecretKey)
-                .WithSSL(options.UseSSL)
-                .Build();
-        });
-
-        services.AddScoped<IFileStorageService, MinioFileStorageService>();
-
-
+            options.Password.RequiredLength = 4;
+        })
+           .AddEntityFrameworkStores<BinaLiteDbContext>()
+           .AddDefaultTokenProviders();
     }
 }

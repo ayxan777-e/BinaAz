@@ -17,6 +17,7 @@ public static class MiddlewareSetup
         }
 
         app.UseHttpsRedirection();
+        app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
     }

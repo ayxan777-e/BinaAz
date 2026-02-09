@@ -1,10 +1,11 @@
 ﻿using Domain.Entities;
 using Domain.Entities.Simple;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Context;
 
-public class BinaLiteDbContext: DbContext
+public class BinaLiteDbContext: IdentityDbContext<User>
 {
     public BinaLiteDbContext(DbContextOptions<BinaLiteDbContext> options) : base(options)
     {
