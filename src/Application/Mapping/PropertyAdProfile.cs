@@ -10,6 +10,7 @@ public class PropertyAdProfile: Profile
     {
         CreateMap<PropertyAd, GetAllPropertyAdResponse>();
         CreateMap<PropertyAd, GetByIdPropertyAdResponse>();
-        CreateMap<CreatePropertyAdRequest,PropertyAd>();
+        CreateMap<CreatePropertyAdRequest, PropertyAd>();
+        CreateMap<UpdatePropertyAdRequest, PropertyAd>();
     }
 }
